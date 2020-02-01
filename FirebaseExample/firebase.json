@@ -7,6 +7,12 @@
       "rewrites": [{
           "source": "/timestamp",
           "function": "app"
+      },{
+        "source": "/signup",
+          "function": "app"
+      },{
+        "source": "/login",
+          "function": "app"
       }],
     "ignore": [
       "firebase.json",

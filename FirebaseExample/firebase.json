@@ -13,6 +13,18 @@
       },{
         "source": "/login",
           "function": "app"
+      },{
+        "source": "/sendEmail",
+          "function": "app"
+      },{
+        "source": "/test",
+          "function": "app"
+      },{
+        "source": "/getprice",
+          "function": "app"
+      },{
+        "source": "/changePassword",
+          "function": "app"
       }],
     "ignore": [
       "firebase.json",

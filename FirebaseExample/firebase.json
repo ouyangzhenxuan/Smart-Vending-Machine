@@ -14,7 +14,7 @@
         "source": "/login",
           "function": "app"
       },{
-        "source": "/sendEmail",
+        "source": "/sendemail",
           "function": "app"
       },{
         "source": "/test",
@@ -23,7 +23,19 @@
         "source": "/getprice",
           "function": "app"
       },{
-        "source": "/changePassword",
+        "source": "/changepassword",
+          "function": "app"
+      },{
+        "source": "/deletepin",
+          "function": "app"
+      },{
+        "source": "/index/test",
+          "function": "app"
+      },{
+        "source": "/user/deletepin",
+          "function": "app"
+      },{
+        "source": "/user/asyntest",
           "function": "app"
       }],
     "ignore": [

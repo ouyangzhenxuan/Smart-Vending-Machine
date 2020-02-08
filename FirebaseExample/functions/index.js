@@ -27,12 +27,17 @@ var config = {
     measurementId: "G-5C2MKGRZHY"
   };
 
-  firebase.initializeApp(config);
+firebase.initializeApp(config);
 
 const app = express();
 
 const routes = require('./routes');
+
+app.use('/index', require('./routes/index'));
 app.use('/', routes);
+app.use('/getprice', require('./routes/price'));
+app.use('/user', require('./routes/user-routes'));
+
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
@@ -56,8 +61,7 @@ function writeUserData(name, email, password) {
     }
   }
 
-app.use('/test', require('./routes'));
-app.use('/getprice', require('./routes'));
+
 
 // app.use('/', require('./routes/index'));
 
@@ -73,7 +77,7 @@ app.post('/signup', (request, response) => {
     let hash = crypto.createHash('md5').update(email).digest("hex")
     var refer = firebase.database().ref('users');
     var pass;
-    refer.on("value", function(snapshot) {
+    refer.once("value", function(snapshot) {
         pass = snapshot.child(hash).child('password').val();
         console.log(pass);
     });
@@ -124,7 +128,7 @@ function makeid(length) {
     return result;
  }
 
-app.post('/sendEmail', (request, response) => {
+app.post('/sendemail', (request, response) => {
     var tempPassword = makeid(6);
     var email=request.body.email;
     var mailOptions = {
@@ -151,7 +155,7 @@ app.post('/sendEmail', (request, response) => {
     });
 });
 
-app.post('/changePassword', (request, response) => {
+app.post('/changepassword', (request, response) => {
     var new_password=request.body.password;
     var email=request.body.email;
     var input_pin = request.body.pin;
@@ -160,7 +164,7 @@ app.post('/changePassword', (request, response) => {
     console.log(hash)
     var ref_pin = firebase.database().ref('temporaryPin');
     var inside_pin;
-    ref_pin.on("value", function(snapshot) {
+    ref_pin.once("value", function(snapshot) {
         if(snapshot.child(hash).child('pin').val()==input_pin && input_pin!=null){
             firebase.database().ref('users/' + hash).update({
                 password : new_password,

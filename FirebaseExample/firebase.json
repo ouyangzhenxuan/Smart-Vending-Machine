@@ -34,9 +34,6 @@
       },{
         "source": "/user/deletepin",
           "function": "app"
-      },{
-        "source": "/user/asyntest",
-          "function": "app"
       }],
     "ignore": [
       "firebase.json",

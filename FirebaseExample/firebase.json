@@ -25,6 +25,9 @@
       },{
         "source": "/changePassword",
           "function": "app"
+      },{
+        "source": "/addvm",
+          "function": "app"
       }],
     "ignore": [
       "firebase.json",

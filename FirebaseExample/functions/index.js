@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+// let Promise = require('promise')
 const express = require('express');
 var firebase = require('firebase');
 const crypto = require('crypto')
@@ -31,7 +32,7 @@ var config = {
 
 const app = express();
 
-const routes = require('./routes');
+const routes = require('./routes/index');
 app.use('/', routes);
 
 var bodyParser = require('body-parser');
@@ -81,7 +82,9 @@ app.post('/signup', (request, response) => {
             firebase.database().ref('users/' + hash).set({
                 username: name,
                 email: email,
-                password : password
+                password : crypto.createHash('md5').update(password).digest("hex"),
+                vm_number:0,
+                vm_id:0,
             });
             response.send("complete");
         }else{
@@ -93,6 +96,7 @@ app.post('/login', (request, response)=>{
     var ref = firebase.database().ref('users');
     ref.on("value", function(snapshot) {
        var password_input=request.body.password;
+       password_input = crypto.createHash('md5').update(password_input).digest("hex")
        var email_input=request.body.email;
        
        let hash = crypto.createHash('md5').update(email_input).digest("hex")
@@ -149,17 +153,28 @@ app.post('/sendEmail', (request, response) => {
         email: email,
         pin: tempPassword,
     });
+
+    setTimeout(function(){
+        firebase.database().ref('temporaryPin/'+hash).remove()
+                .then(function(){
+                    console.log('succes');
+                })
+                .catch(function(error){
+                    console.log('Remove fail: '+ error);
+                });
+
+    }, 8 * 10000);
 });
 
 app.post('/changePassword', (request, response) => {
     var new_password=request.body.password;
+    new_password = crypto.createHash('md5').update(new_password).digest("hex")
     var email=request.body.email;
     var input_pin = request.body.pin;
     console.log(email)
     let hash = crypto.createHash('md5').update(email).digest("hex")
     console.log(hash)
     var ref_pin = firebase.database().ref('temporaryPin');
-    var inside_pin;
     ref_pin.on("value", function(snapshot) {
         if(snapshot.child(hash).child('pin').val()==input_pin && input_pin!=null){
             firebase.database().ref('users/' + hash).update({
@@ -174,8 +189,48 @@ app.post('/changePassword', (request, response) => {
     },function (error){
         response.send(error);
     });
-    
+
 });
+
+app.post('/addvm', (request, response) => {
+    let latitude = request.body.latitude
+    let longitude = request.body.longitude
+    var email=request.body.email;
+    let hash = crypto.createHash('md5').update(email).digest("hex")
+    var refer = firebase.database().ref('users');
+
+    var ref_vm = firebase.database().ref('users/'+hash);
+    var ref_vm_set = firebase.database().ref('users/'+hash);
+    var vm_id = 0
+    var real_vm = 0
+    let p = new Promise(function(resolve, reject) {
+        ref_vm.once("value", function(snapshot) {       
+            vm_id = snapshot.child('vm_number').val()+1
+            real_vm = snapshot.child('vm_real').val()
+            
+            console.log([vm_id,real_vm])
+            resolve([vm_id,real_vm])
+        })
+        console.log('tishu')
+      }); 
+    p.then(function(params){
+        console.log("WTF2")
+        firebase.database().ref('users/' + hash+'/vm/'+vm_id).set({
+            vm_id: params[0],
+            latitude: latitude,
+            longitude:  longitude,
+            sales: 0,
+        });
+    }).then(function(params){
+        console.log("WTF3")
+        ref_vm_set.update({
+            vm_real : real_vm+1,
+            vm_number : vm_id
+        })
+    })
+    response.send("complete");
+});
+
 
  // Create and Deploy Your First Cloud Functions
  // https://firebase.google.com/docs/functions/write-firebase-functions

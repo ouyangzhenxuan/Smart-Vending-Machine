@@ -28,12 +28,22 @@ var config = {
     measurementId: "G-5C2MKGRZHY"
   };
 
-  firebase.initializeApp(config);
+firebase.initializeApp(config);
 
 const app = express();
 
 const routes = require('./routes/index');
 app.use('/', routes);
+// app.use('/index', './routes/index');
+
+//
+const price = require('./routes/price');
+app.use('/price', price);
+const user = require('./routes/user');
+app.use('/user', user);
+const vendingmachine = require('./routes/vendingmachine');
+app.use('/vm', vendingmachine);
+//
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies

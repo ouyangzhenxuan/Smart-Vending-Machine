@@ -28,6 +28,24 @@
       },{
         "source": "/addvm",
           "function": "app"
+      },{
+        "source": "/price/getprice",
+          "function": "app"
+      },{
+        "source": "/user/login",
+          "function": "app"
+      },{
+        "source": "/user/signup",
+          "function": "app"
+      },{
+        "source": "/user/sendemail",
+          "function": "app"
+      },{
+        "source": "/user/changepassword",
+          "function": "app"
+      },{
+        "source": "/vm/addvm",
+          "function": "app"
       }],
     "ignore": [
       "firebase.json",

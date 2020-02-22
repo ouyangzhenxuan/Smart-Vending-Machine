@@ -46,6 +46,15 @@
       },{
         "source": "/vm/addvm",
           "function": "app"
+      },{
+        "source": "/vm/deletevm",
+          "function": "app"
+      },{
+        "source": "/vm/getallvm",
+          "function": "app"
+      },{
+        "source": "/vm/updatevm",
+          "function": "app"
       }],
     "ignore": [
       "firebase.json",

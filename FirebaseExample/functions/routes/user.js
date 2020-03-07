@@ -16,19 +16,6 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-// var config = {
-//     apiKey: "AIzaSyDEg1WylC8trdpBbfqKLRA4zB0jy0jPnic",
-//     authDomain: "vending-insights-smu.firebaseapp.com",
-//     databaseURL: "https://vending-insights-smu.firebaseio.com",
-//     projectId: "vending-insights-smu",
-//     storageBucket: "vending-insights-smu.appspot.com",
-//     messagingSenderId: "571022970290",
-//     appId: "1:571022970290:web:65a2eafc131f00b9d0e8ab",
-//     measurementId: "G-5C2MKGRZHY"
-//   };
-
-// firebase.initializeApp(config);
-
 routes.post('/login', (request, response)=>{
     var ref = firebase.database().ref('users');
     
@@ -88,18 +75,6 @@ routes.post('/login', (request, response)=>{
             }
         }
     );
-        // if(pass==null){
-        //     firebase.database().ref('users/' + hash).set({
-        //         username: name,
-        //         email: email,
-        //         password : crypto.createHash('md5').update(password).digest("hex"),
-        //         vm_number:0,
-        //         vm_id:0,
-        //     });
-        //     response.send("complete");
-        // }else{
-        //     response.send("user already exist");
-        // }
 });
 
 function makeid(length) {

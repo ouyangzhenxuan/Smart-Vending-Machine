@@ -32,6 +32,9 @@
         "source": "/price/getprice",
           "function": "app"
       },{
+        "source": "/price/pricefromdb",
+          "function": "app"
+      },{
         "source": "/user/login",
           "function": "app"
       },{
@@ -54,6 +57,15 @@
           "function": "app"
       },{
         "source": "/vm/updatevm",
+          "function": "app"
+      },{
+        "source": "/pdf/create-pdf",
+          "function": "app"
+      },{
+        "source": "/pdf/fetch-pdf",
+          "function": "app"
+      },{
+        "source": "/simulator/order",
           "function": "app"
       }],
     "ignore": [

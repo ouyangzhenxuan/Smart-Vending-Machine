@@ -3,6 +3,10 @@ const routes = require('express').Router();
 routes.get('/test', (req, res) => {
     res.status(200).json({ message: 'Connected!' });
   });
+
+routes.get('/timestamp', (req, res) => {
+    
+})
   
 routes.get('/getprice', (request, response)=>{
     const puppeteer = require('puppeteer');

@@ -59,13 +59,52 @@
         "source": "/vm/updatevm",
           "function": "app"
       },{
+        "source": "/vm/getallproduct",
+          "function": "app"
+      },{
+        "source": "/vm/addproduct",
+          "function": "app"
+      },{
+        "source": "/vm/updateproduct",
+          "function": "app"
+      },{
+        "source": "/vm/pie",
+          "function": "app"
+      },{
+        "source": "/vm/vminfo2",
+          "function": "app"
+      },{
+        "source": "/vm/vminfo",
+          "function": "app"
+      },{
+        "source": "/vm/updatetransaction",
+          "function": "app"
+      },{
+        "source": "/vm/getstock",
+          "function": "app"
+      },{
+        "source": "/vm/deleteproduct",
+          "function": "app"
+      },{
+        "source": "/vm/order",
+          "function": "app"
+      },{
+        "source": "/vm/restock",
+          "function": "app"
+      },{
         "source": "/pdf/create-pdf",
           "function": "app"
       },{
         "source": "/pdf/fetch-pdf",
           "function": "app"
       },{
-        "source": "/simulator/order",
+        "source": "/analysis/getsevendaysitemsales",
+          "function": "app"
+      },{
+        "source": "/analysis/getsevendaysvmsales",
+          "function": "app"
+      },{
+        "source": "/analysis/getyearprofitbyuser",
           "function": "app"
       }],
     "ignore": [

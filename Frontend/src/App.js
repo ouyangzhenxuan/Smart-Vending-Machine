@@ -27,7 +27,6 @@ const TablePage = React.lazy(() => import('pages/TablePage'));
 const TypographyPage = React.lazy(() => import('pages/TypographyPage'));
 const PdfPage = React.lazy(() => import('./pages/PdfPage'));
 const Simulator = React.lazy(() => import('./pages/Simulator'));
-const Simulator2 = React.lazy(() => import('./pages/Simulator2'));
 
 
 const getBasename = () => {
@@ -70,7 +69,6 @@ class App extends React.Component {
                 <Route exact path="/charts" component={ChartPage} />
                 <Route exact path="/pdf" component={PdfPage} />
                 <Route exact path="/simulator" component={Simulator} />
-                <Route exact path="/simulator2" component={Simulator2} />
 
             {/* </MainLayout> */}
             </React.Suspense>

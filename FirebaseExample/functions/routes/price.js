@@ -1,11 +1,8 @@
 const routes = require('express').Router();
-const puppeteer = require('puppeteer');
-var firebase = require('firebase');
-const crypto = require('crypto');
-
 
 routes.get('/getprice', (request, response)=>{
-    
+    response.end('sss');
+    const puppeteer = require('puppeteer');
     var theItem;
     theItem = puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080','--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36"'] }).then(async browser => {
  
@@ -83,24 +80,6 @@ routes.get('/getprice', (request, response)=>{
         }).catch(function(error) {
             console.error(error);
     });
- });
-
- routes.post('/pricefromdb', (request, response)=>{
-    var email = request.body.email;
-    var vm_id = request.body.vm_id;
-    var itemName = request.body.item;
-    
-    let hash = crypto.createHash('md5').update(email).digest("hex")
-    var ref = firebase.database().ref('vendingmachines/' + hash + '/vm/' + vm_id + '/products/' + itemName);
-    var price;
-    ref.once('value', function(snapshots){
-        price = snapshots.child('price').val();
-    }).then(function(){
-        response.send(''+price);
-    }).catch(function(error){
-        console.log(error);
-    });
-
  });
   
 module.exports = routes;

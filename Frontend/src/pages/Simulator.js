@@ -8,180 +8,456 @@ import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import picture from '../pictures/Mona-Lisa-256x256.jpg';
+// import DatePicker from "react-datepicker";
+import {
+  Row,
+  Col,
+  Card,
+  CardHeader,
+  CardBody,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Label,
+  Input,
+  Button,
+  Form,
+  FormGroup,
+  FormText,
+  UncontrolledButtonDropdown,
+  DropdownToggle,
+  DropdownItem,
+  DropdownMenu,
+} from 'reactstrap';
 
-// global value
-var email = 'jinxund@smu.edu'
-var vm_id = 46
+import Page from 'components/Page';
 
-class Simulator extends React.Component{
+// var email = 'jinxund@smu.edu'
+// var vm_id = 46
 
-    constructor(props){
-        super();
-        this.state = {
-            orderItem: '',
-            orderAmount: 1,
-            price: 0,
-            vm_id: vm_id,
-            email: email,
+class Simulator extends React.Component {
 
-            orderInfo:{
-                orderItem: '',
-                orderAmount: 1,
-                price: 3,
-            },
+  constructor(props) {
+    super(props);
+    this.state = {
+      // item: '',
+      // amount: 1,
+      // price: 1.5,
+      // email: 'jinxund@smu.edu',
+      // id: 1,
+      // amount: 10,
+      // date: Date.now(),
 
-            itemArray: [
-                {
-                    id: 1,
-                    item: "Coke", 
-                    price: 2
-                },
-                {
-                    id: 2,
-                    item: "Sprite", 
-                    price: 3
-                }
-            ],
+      item: '',
+      amount: 1,
+      unit_price: 0,
+      vm_id: 1,
+      // yuc@smu.edu
+      email: 'yuc@smu.edu',
+      total_price: 0,
+      restock_price: 1,
+      restock_total_price: 0,
 
-            
-        }
+      vm_id_array:[],
+
+      date: '',
+
+      year: 2020,
+      month: 3,
+      day: 1,
+
+      allvm: '',
+
+      // orderInfo:{
+      //     orderItem: '',
+      //     orderAmount: 1,
+      //     price: 3,
+      // },
+
+      itemArray: [
+          {
+              id: 1,
+              item: "Coke-testing", 
+              price: 2
+          }
+      ],
+
     }
+  }
 
-    changeHandler = () => {
+  dateChangeHandler = (event) => {
+    var date = event.target.value;
+    var list = date.split("-");
+    this.setState({ 
+      date: date,
+      year: list[0],
+      month: list[1],
+      day: list[2]
+    });
+    console.log(this.state);
+  }
+  onSubmitId = () =>{
+    var allvm;
+    axios.post('http://localhost:5000/vm/getallvm',{
+      email: this.state.email
+    })
+    .then(response=>{
+      if(response.data !== null){
+        allvm = response.data
+      }else{
+        console.log('fail to get all vm datas')
+      }
+    })
+    .then(()=>{
+      this.setState({
+        vm_id_array: Object.keys(allvm),
+        allvm: allvm
+      })
+      
+      console.log(allvm)
+      console.log(this.state)
+    }).then(()=>{
+      // var vm_id_list = Object.keys(this.state.allvm)
+      // // var 
+      // this.setState({
 
-    }
+      // })
+    })
+  }
 
-    increaseAmount = () => {
-        this.setState((prevState, props)=>
-            ({
-                orderInfo:{
-                    ...prevState.orderInfo,
-                    orderAmount: this.state.orderInfo.orderAmount + 1
-                },
+  emailChangeHandler = (event) =>{
+    this.setState({
+      [event.target.name]: event.target.value,
+    });
+  }
 
-                orderAmount: this.state.orderAmount + 1
-            })
-        )
-        console.log(this.state)
-        console.log(this.state.orderInfo.orderAmount)
-    }
-
-    decreaseAmount = () => {
-        
-        if(this.state.orderInfo.orderAmount > 1){
-            this.setState(
-                {
-                    orderInfo:{
-                        orderAmount: this.state.orderInfo.orderAmount - 1
-                    },
-
-                    orderAmount: this.state.orderAmount - 1
-                    
-                }
-            )
-        }
-        console.log(this.state)
-        console.log(this.state.orderInfo.orderAmount)
-    }
-
-    itemChange = event => {
-        console.log(event)
-        axios.post('http://localhost:5000/price/pricefromdb', {
-            email: this.state.email,
-            vm_id: this.state.vm_id,
-            item: event.target.value
+  itemChangeHandler = (event) =>{
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, ()=>{
+      this.setState({
+        unit_price: this.state.allvm[this.state.vm_id]['products'][this.state.item]['price'],
+      }, ()=>{
+        this.setState({
+          total_price: this.state.amount * this.state.unit_price
         })
-        .then(response=>{
-            console.log(response.data)
-            if(response.data !== ''){
-                this.setState({
-                    price: parseInt(response.data)
-                })
-            }else{
-                console.log('fail to update price');
-            }
-        }).then(()=>{
-            this.setState({ 
-                [event.target.name]: event.target.value
-            });
-            this.setState((prevState, props)=>({
-                orderInfo: {
-                    ...prevState.orderInfo,
-                    [event.target.name]: event.target.value
-                }
-            })
-            );
-        }).then(()=>{
-            console.log(this.state.orderInfo)
-        });
+      })
+    });
+  }
+
+  amountChangeHandler = (event) =>{
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, ()=>{
+      this.setState({
+        total_price: this.state.amount * this.state.unit_price,
+        restock_total_price: this.state.amount * this.state.restock_price
+      })
+    });
+  }
+
+  /**
+   * 
+   * we need a json to store
+   * {
+   *  item: 'Coke',
+   *  price: 3,
+   * }
+   * 
+   * */ 
+  vmidChangeHandler = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, ()=>{
+      // when vm_id change, the product list also change
+      var product_list = Object.keys(this.state.allvm[event.target.value]['products']);
+      var item_array = [];
+      for(var i=0; i<product_list.length; i++){
+        item_array.push({
+          id: product_list[i],
+          item: product_list[i],
+          unit_price: this.state.allvm[event.target.value]['products'][product_list[i]]['price'],
+        })
+      }
+      this.setState({
+        itemArray: item_array
+      })
+    });
+  }
+
+  restockPriceChangeHandler = (event) =>{
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, ()=>{
+      this.setState({
+        restock_total_price: this.state.amount * this.state.restock_price
+      })
+    });
     
+    console.log(this.state.restock_price);
+  }
+
+  restockTotalPriceChangeHandler = (event) =>{
+    this.setState({
+      [event.target.name]: event.target.value,
+    });
+    console.log(this.state.restock_total_price);
+  }
+
+
+  confirmPurchase = () => {
+    console.log(this.state.item)
+    console.log(this.state.amount)
+
+    axios.post('http://localhost:5000/vm/updatetransaction', this.state)
+      .then(response => {
+        if (response.data === 'update success') {
+          alert('purchase done!')
+        } else {
+          alert('fail to purchase!')
+        }
+      });
+    
+  }
+  
+  confirmRestock = () => {
+    console.log(this.state.item)
+    console.log(this.state.amount)
+
+    axios.post('http://localhost:5000/vm/getstock', this.state)
+      .then(response => {
+        if (response.data === 'restock success') {
+          alert('restock success!');
+        } else {
+          alert('restock fail!');
+        }
+      });
+
+    // axios.post('https://vending-insights-smu.firebaseapp.com/vm/updatetransaction', this.state)
+    //   .then(response => {
+    //     if (response.data == 'update success') {
+    //       alert('purchase done!')
+    //     } else {
+    //       alert('fail to purchase!')
+    //     }
+    //   });
+    
+  }
+
+  render() {
+    return (
+      <Page title="Simulator" breadcrumbs={[{ name: 'Simulator', active: true }]}>
+
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Email</CardHeader>
+              <CardBody>
+                <TextField
+                  id="half-width-text-field"
+                  placeholder='xxx@smu.edu'
+                  margin="normal"
+                  fullWidth
+                  name='email'
+                  value='yuc@smu.edu'
+                  onChange={this.emailChangeHandler}
+                  
+                />
+                <Button
+                  fullwidth="true"
+                  variant="contained"
+                  color="primary"
+                  onClick={this.onSubmitId}
+                >
+                  submit
+              </Button>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Vending Machine ID</CardHeader>
+              <CardBody>
+                <FormControl>
+                  <InputLabel id="demo-simple-select-label">id</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    name='vm_id'
+                    value={this.state.vm_id}
+                    onChange={this.vmidChangeHandler}>
+                    {/* <MenuItem value={'1'}>id</MenuItem> */}
+                    {
+                      this.state.vm_id_array.map((row, index)=>{
+                      return(
+                        <MenuItem key={row} value={row}>{row}</MenuItem>
+                        )
+                      })
+                    }
+                  </Select>
+                </FormControl>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Vending Machine Item</CardHeader>
+              <CardBody>
+                <FormControl>
+                  <InputLabel id="demo-simple-select-label">Item</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    onChange={this.itemChangeHandler}
+                    value={this.state.item}
+                    name='item'>
+                    {
+                      this.state.itemArray.map((row, index)=>{
+                      return(
+                        <MenuItem key={row.id} value={row.item}>{row.item}</MenuItem>
+                        )
+                      })
+                    }
+                    
+                  </Select>
+                  <TextField 
+                    id="standard-required-1" 
+                    label="unit_price" 
+                    value={this.state.unit_price}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    variant="filled"
+                    />
+                  
+                  <TextField 
+                    id="standard-required-1" 
+                    label="restock_price" 
+                    name="restock_price"
+                    type="number"
+                    onChange={this.restockPriceChangeHandler}
+                    // variant="filled"
+                    />
+                </FormControl>
+                
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Product Amount</CardHeader>
+              <CardBody>
+                <TextField
+                  // id="half-width-text-field"
+                  placeholder={''+this.state.amount}
+                  margin="normal"
+                  name="amount"
+                  value={this.state.amount}
+                  onChange={this.amountChangeHandler}
+                  fullWidth
+                  type="number"
+                />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Total price</CardHeader>
+              <CardBody>
+                <TextField 
+                    id="standard-required-2" 
+                    label="total_price"
+                    value={this.state.total_price}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    variant="filled"
+                />
+                
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Restock Total price</CardHeader>
+              <CardBody>
+                <TextField 
+                    id="standard-required-2" 
+                    label="restock_total_price"
+                    value={this.state.restock_total_price}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    variant="filled"
+                />
+                
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <Card>
+              <CardHeader>Date</CardHeader>
+              <CardBody>
+                <Form>
+                  <FormGroup>
+
+                    <Label for="gou tm">DateTime</Label>
+                    <Input
+                      type="date"
+                      name="date"
+                      id='dt'
+                      value={this.state.date}
+                      placeholder="datetime placeholder"
+                      onChange={this.dateChangeHandler} />
+                  </FormGroup>
+                </Form>
+                <Button
+                  fullwidth="true"
+                  variant="contained"
+                  color="primary"
+                  onClick={this.confirmPurchase}
+                >
+                  Make Order
+                 </Button>
+                 <Button
+                  fullwidth="true"
+                  variant="contained"
+                  color="secondary"
+                  onClick={this.confirmRestock}
+                >
+                  Re-Stocking
+                 </Button>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
         
-    }
 
-    confirmPurchase = () => {
-        console.log(this.state.orderItem)
-        console.log(this.state.orderAmount)
-        console.log(this.state.orderInfo)
-        axios.post('http://localhost:5000/simulator/order', this.state.orderInfo)
-        .then(response=>{
-            if(response.data === 'success'){
-                alert('purchase done!')
-            }else{
-                alert('fail to purchase!')
-            }
-        });
-    }
+      </Page>
 
-    render(){
-        return(
-            <div>
-                
-                <div>
-                    <FormControl>
-                        <InputLabel id="demo-simple-select-label">Item</InputLabel>
-                        <Select 
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                onChange={this.itemChange}
-                                value={this.state.orderItem}
-                                name='orderItem'>
-                            {/* <MenuItem value={'Coke'}>Coke</MenuItem>
-                            <MenuItem value={'Sprite'}>Sprite</MenuItem> */}
-                            {/* <MenuItem value={'Water'}>Water</MenuItem> */}
-                            {
-                                this.state.itemArray.map((row, index)=>{
-                                    return(
-                                        <MenuItem key={row.id} value={row.item}>{row.item}</MenuItem>
-                                    )
-                                })
-                            }
-                        </Select>
-                    </FormControl>
-                </div>
-
-                <div>
-                    <label>Quantity: </label><br />
-                    <input type='text' value={this.state.orderInfo.orderAmount} onChange={this.changeHandler} readOnly align='center'/>
-                    <button className='btn-secondary' onClick={this.increaseAmount}>+</button>
-                    <button className='btn-secondary' onClick={this.decreaseAmount}>-</button>
-                </div>
-
-                <div>
-                    price: ${this.state.price}
-                </div>
-
-                <div>
-                    <button className='btn-primary' onClick={this.confirmPurchase}>Confirm purchase</button>
-                </div>
-                
-                <div>
-                    <img src={picture} alt="pic"></img>
-                </div>
-            </div>
-        );
-    }
-    
+    );
+  }
 }
 
 export default Simulator;
+

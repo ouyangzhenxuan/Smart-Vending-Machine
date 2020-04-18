@@ -1,9 +1,7 @@
 const routes = require('express').Router();
-// const express = require('express');
 var firebase = require('firebase');
 const crypto = require('crypto')
 var nodemailer = require('nodemailer');
-
 
 let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -16,6 +14,28 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+// var config = {
+//     apiKey: "AIzaSyDEg1WylC8trdpBbfqKLRA4zB0jy0jPnic",
+//     authDomain: "vending-insights-smu.firebaseapp.com",
+//     databaseURL: "https://vending-insights-smu.firebaseio.com",
+//     projectId: "vending-insights-smu",
+//     storageBucket: "vending-insights-smu.appspot.com",
+//     messagingSenderId: "571022970290",
+//     appId: "1:571022970290:web:65a2eafc131f00b9d0e8ab",
+//     measurementId: "G-5C2MKGRZHY"
+//   };
+
+// firebase.initializeApp(config);
+
+/**
+ * Function description: handle user login request
+ * @param {request}: request from frontend
+ *                  email: user's login email
+ *                  password: user's login password
+ * @param {response}: response send to frontend
+ * @return : 'okay': login successfully
+ *           'no': login fail
+*/
 routes.post('/login', (request, response)=>{
     var ref = firebase.database().ref('users');
     
@@ -35,10 +55,6 @@ routes.post('/login', (request, response)=>{
             if(password==password_input){
                 response.send('okay');
             }else{
-                console.log(password);
-                console.log(password_input);
-                console.log(hash);
-                console.log(email_input);
                 response.send('no');
             }
         }
@@ -46,6 +62,16 @@ routes.post('/login', (request, response)=>{
     
  });
 
+ /**
+ * Function description: handle user signup request
+ * @param {request}: request from frontend
+ *                  email: user's login email
+ *                  password: user's login password
+ *                  name: user's registered name
+ * @param {response}: response send to frontend
+ * @return : 'okay': login successfully
+ *           'no': login fail
+*/
  routes.post('/signup', (request, response) => {
     console.log("HTTP Get Request");
     var name=request.body.name;
@@ -77,6 +103,12 @@ routes.post('/login', (request, response)=>{
     );
 });
 
+ /**
+ * Function description: generate temporary password
+ * @param {length}: length of password
+ * @return {result}: generated password
+ * 
+*/
 function makeid(length) {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -87,6 +119,13 @@ function makeid(length) {
     return result;
  }
 
+/**
+ * Function description: send email with temporary password to user
+ * @param {request}: request from frontend
+ *                  email: user's login email
+ * @param {response}: response send to frontend
+ * 
+*/
 routes.post('/sendemail', (request, response) => {
     var tempPassword = makeid(6);
     var email=request.body.email;
@@ -125,6 +164,17 @@ routes.post('/sendemail', (request, response) => {
     }, 8 * 10000);
 });
 
+/**
+ * Function description: change user' password
+ * @param {request}: request from frontend
+ *                  email: user's login email
+ *                  password: user's login password
+ *                  pin: validation pin
+ * @param {response}: response send to frontend
+ *                  '200': change password successfully
+ *                  'WRONG': change password fail
+ * 
+*/
 routes.post('/changepassword', (request, response) => {
     var new_password=request.body.password;
     var email=request.body.email;

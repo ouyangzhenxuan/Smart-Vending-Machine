@@ -8,6 +8,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import Container from 'react-bootstrap/Container';
+
 // import DatePicker from "react-datepicker";
 import {
   Row,
@@ -98,7 +100,7 @@ class Simulator extends React.Component {
   }
   onSubmitId = () =>{
     var allvm;
-    axios.post('http://localhost:5000/vm/getallvm',{
+    axios.post('https://vending-insights-smu.firebaseapp.com/vm/getallvm',{
       email: this.state.email
     })
     .then(response=>{
@@ -209,7 +211,7 @@ class Simulator extends React.Component {
     console.log(this.state.item)
     console.log(this.state.amount)
 
-    axios.post('http://localhost:5000/vm/updatetransaction', this.state)
+    axios.post('https://vending-insights-smu.firebaseapp.com/vm/updatetransaction', this.state)
       .then(response => {
         if (response.data === 'update success') {
           alert('purchase done!')
@@ -224,7 +226,7 @@ class Simulator extends React.Component {
     console.log(this.state.item)
     console.log(this.state.amount)
 
-    axios.post('http://localhost:5000/vm/getstock', this.state)
+    axios.post('https://vending-insights-smu.firebaseapp.com/vm/getstock', this.state)
       .then(response => {
         if (response.data === 'restock success') {
           alert('restock success!');
@@ -246,9 +248,11 @@ class Simulator extends React.Component {
 
   render() {
     return (
-      <Page title="Simulator" breadcrumbs={[{ name: 'Simulator', active: true }]}>
-
-
+      <Container>
+      <Page title="Simulator">
+        {/* <Row>
+          <Col sm="12" md={{ size: 6, offset: 3 }}>hello</Col>
+        </Row> */}
         <Row>
           <Col md={12}>
             <Card>
@@ -260,7 +264,7 @@ class Simulator extends React.Component {
                   margin="normal"
                   fullWidth
                   name='email'
-                  value='yuc@smu.edu'
+                  // value='yuc@smu.edu'
                   onChange={this.emailChangeHandler}
                   
                 />
@@ -338,7 +342,7 @@ class Simulator extends React.Component {
                     />
                   
                   <TextField 
-                    id="standard-required-1" 
+                    id="standard-required-2" 
                     label="restock_price" 
                     name="restock_price"
                     type="number"
@@ -364,7 +368,7 @@ class Simulator extends React.Component {
                   name="amount"
                   value={this.state.amount}
                   onChange={this.amountChangeHandler}
-                  fullWidth
+                  
                   type="number"
                 />
               </CardBody>
@@ -420,7 +424,7 @@ class Simulator extends React.Component {
                 <Form>
                   <FormGroup>
 
-                    <Label for="gou tm">DateTime</Label>
+                    <Label for="date">DateTime</Label>
                     <Input
                       type="date"
                       name="date"
@@ -436,7 +440,7 @@ class Simulator extends React.Component {
                   color="primary"
                   onClick={this.confirmPurchase}
                 >
-                  Make Order
+                  Place Order
                  </Button>
                  <Button
                   fullwidth="true"
@@ -444,7 +448,7 @@ class Simulator extends React.Component {
                   color="secondary"
                   onClick={this.confirmRestock}
                 >
-                  Re-Stocking
+                  Restock
                  </Button>
               </CardBody>
             </Card>
@@ -454,7 +458,7 @@ class Simulator extends React.Component {
         
 
       </Page>
-
+      </Container>
     );
   }
 }

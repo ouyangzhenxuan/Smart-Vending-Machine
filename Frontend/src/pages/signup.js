@@ -1,10 +1,8 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -47,25 +45,180 @@ const useStyles = makeStyles(theme => ({
 
 
 
-
+// signup page that allows user to create a new account
 export default function SignUp(){
-    const state = {
+  const [state, setState] = React.useState({
         name:"",
         password:"",
-        email:""
-    }
+        email:"",
+        cpassword:""
+  })
+
+    const [error, setError] = React.useState({
+      email_error:"",
+      password_error:"",
+      cpassword_error:"",
+      emailiserror:false,
+      cpassiserror:false,
+      passiserror:false
+    })
+
+    // change handler for inputs
     const changeHandler = (e) => {
+      setState({...state, [e.target.name]: e.target.value})
         const name = e.target.name;
         const value = e.target.value;
-        
-        state[name]=value;
+        validation(name,value)
       }
 
+    // check input validation
+    const validation = (name, value)=>{
+      if(name === 'email'){
+        if(value.length === 0){
+          setError(prevState => {
+            var email_error = prevState.email_error;
+            var emailiserror = prevState.emailiserror;
+            email_error = ""
+            emailiserror = false
+            return { ...prevState, email_error,emailiserror };
+          });
+        }
+        else if(! value.match(/[a-zA-Z0-9.-]{1,}@[a-zA-Z0-9.-]{2,}[.]{1}[a-zA-Z]{2,}/)){
+          setError(prevState => {
+            var email_error = prevState.email_error;
+            var emailiserror = prevState.emailiserror;
+            email_error = "invalid email type"
+            emailiserror = true
+            return { ...prevState, email_error,emailiserror };
+          });
+        }
+        else{
+          setError(prevState => {
+            var email_error = prevState.email_error;
+            var emailiserror = prevState.emailiserror;
+            email_error = ""
+            emailiserror = false
+            return { ...prevState, email_error,emailiserror };
+          });
+        }
+     }
+     if(name === 'password'){
+      if(value.length === 0){
+        setError(prevState => {
+          var password_error = prevState.password_error;
+          var passiserror = prevState.passiserror;
+          password_error = ""
+          passiserror = false
+          return { ...prevState, password_error,passiserror };
+        });
+          if(error.cpassiserror){
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = ""
+              cpassiserror = false
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+      }
+      else if(value.length > 15 || value.length < 8){
+        setError(prevState => {
+          var password_error = prevState.password_error;
+          var passiserror = prevState.passiserror;
+          password_error = "Your password length should between 8 and 15"
+          passiserror = true
+          return { ...prevState, password_error,passiserror };
+        });
+          if(!(value === state.cpassword) && (state.cpassword !== "")){
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = "Your input doesn't match your previous password"
+              cpassiserror = true
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+          else {
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = ""
+              cpassiserror = false
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+      }
+      else{
+        setError(prevState => {
+          var password_error = prevState.password_error;
+          var passiserror = prevState.passiserror;
+          password_error = ""
+          passiserror = false
+          return { ...prevState, password_error,passiserror };
+        });
+          if(!(value === state.cpassword) && (state.cpassword !== "")){
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = "Your input doesn't match your previous password"
+              cpassiserror = true
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+          else {
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = ""
+              cpassiserror = false
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+      }
+  }
+  if(name === 'cpassword'){
+    
+    if(value.length === 0){
+      setError(prevState => {
+        var cpassword_error = prevState.cpassword_error;
+        var cpassiserror = prevState.cpassiserror;
+        cpassword_error = ""
+        cpassiserror = false
+        return { ...prevState, cpassword_error,cpassiserror };
+      });
+    }
+    else if(!(value === state.password)  && (state.password !== "")){
+      setError(prevState => {
+        var cpassword_error = prevState.cpassword_error;
+        var cpassiserror = prevState.cpassiserror;
+        cpassword_error = "Your input doesn't match your previous password"
+        cpassiserror = true
+        return { ...prevState, cpassword_error,cpassiserror };
+      });
+    }
+    else{
+      setError(prevState => {
+        var cpassword_error = prevState.cpassword_error;
+        var cpassiserror = prevState.cpassiserror;
+        cpassword_error = ""
+        cpassiserror = false
+        return { ...prevState, cpassword_error,cpassiserror };
+      });
+    }
+}
+    }
+
+    // request for signup, and redirects to login page
     const submitHandler = (e) =>{
-        console.log(state)
-        axios.post("https://vending-insights-smu.firebaseapp.com/user/signup",state)
+        const variable = {
+          name: state.name,
+          email:state.email,
+          password:state.password
+        }
+        axios.post("https://vending-insights-smu.firebaseapp.com/signup",variable)
          .then(response => {
-                if(response.data == 'complete'){
+           console.log(response)
+                if(response.data === 'ok'){
                   window.location.href = '/';
                 }
             }).catch(error => {console.log(error)})
@@ -108,6 +261,8 @@ export default function SignUp(){
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                error ={error.emailiserror}
+                helperText = {error.email_error}
                 onChange= {changeHandler}
               />
             </Grid>
@@ -121,6 +276,8 @@ export default function SignUp(){
                 type="password"
                 id="password"
                 autoComplete="password"
+                error ={error.passiserror}
+                helperText = {error.password_error}
                 onChange= {changeHandler}
               />
             </Grid>
@@ -133,6 +290,9 @@ export default function SignUp(){
                 label="Comfirm Password"
                 type="password"
                 id="cpassword"
+                error ={error.cpassiserror}
+                helperText = {error.cpassword_error}
+                onChange= {changeHandler}
                 autoComplete="current-password"
               />
             </Grid>
@@ -143,7 +303,8 @@ export default function SignUp(){
             variant="contained"
             color="primary"
             className={classes.submit}
-            
+            disabled = {error.emailiserror || error.passiserror || error.cpassiserror ||
+            state.name === "" || state.email === "" || state.password === "" || state.cpassword === ""}
           >
             Sign Up
           </Button>

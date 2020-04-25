@@ -33,12 +33,27 @@ export const getColor = (availableColor = 'primary') => {
 
   return color;
 };
-
+// color function that defines button color
 export const getThemeColors = () => [
+  'blue',
+  'indigo',
+  'purple',
+  'pink',
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'teal',
+  'cyan',
+  'white',
+  'gray',
+  'gray-dark',
   'primary',
   'secondary',
   'success',
   'info',
   'warning',
   'danger',
+  'light',
+  'dark',
 ];

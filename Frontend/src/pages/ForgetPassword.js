@@ -1,12 +1,10 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -14,6 +12,7 @@ import axios from 'axios'
 
 function Copyright() {
   return (
+    // regturn SW Vault copy right
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
         SW Vault{' '}
@@ -23,6 +22,7 @@ function Copyright() {
   );
 }
 
+// set up styles
 const useStyles = makeStyles(theme => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -45,30 +45,185 @@ const useStyles = makeStyles(theme => ({
 
 
 
+// forget password page that allows user to get a new password
+export default function ForgetPassword(){
 
-export default function SignUp(){
-    const state = {
-        email:""
-    }
-    const pins = {
+  // set up values for axios requests
+  const [state, setState] = React.useState({
+    email:""
+  })
+
+  const [pins, setPin] = React.useState({
         email:"",
         pin:"",
-        password:""
-    }
+        password:"",
+        cpassword:""
+  })
+
+
+  const [error, setError] = React.useState({
+    email_error:"",
+    password_error:"",
+    cpassword_error:"",
+    pin_error:"",
+    piniserror:false,
+    emailiserror:false,
+    cpassiserror:false,
+    passiserror:false
+  })
+
+  // change handler that handles input change
     const changeHandler = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
-        
-        state[name]=value;
-        pins[name]=value
+      setState({...state, [e.target.name]: e.target.value})
+      setPin({...pins, [e.target.name]: e.target.value})
       }
       const pinHandler = (e) => {
+        setPin({...pins, [e.target.name]: e.target.value})
         const name = e.target.name;
         const value = e.target.value;
-        
-        pins[name]=value;
+        validation(name,value)
       }
 
+      // validation function that checks input validation
+      const validation = (name, value)=>{
+        if(name === 'password'){
+          if(value.length === 0){
+            setError(prevState => {
+              var password_error = prevState.password_error;
+              var passiserror = prevState.passiserror;
+              password_error = ""
+              passiserror = false
+              return { ...prevState, password_error,passiserror };
+            });
+              if(error.cpassiserror){
+                setError(prevState => {
+                  var cpassword_error = prevState.cpassword_error;
+                  var cpassiserror = prevState.cpassiserror;
+                  cpassword_error = ""
+                  cpassiserror = false
+                  return { ...prevState, cpassword_error,cpassiserror };
+                });
+              }
+          }
+          else if(value.length > 15 || value.length < 8){
+            setError(prevState => {
+              var password_error = prevState.password_error;
+              var passiserror = prevState.passiserror;
+              password_error = "Your password length should between 8 and 15"
+              passiserror = true
+              return { ...prevState, password_error,passiserror };
+            });
+              if(!(value === pins.cpassword) && (pins.cpassword !== "")){
+                setError(prevState => {
+                  var cpassword_error = prevState.cpassword_error;
+                  var cpassiserror = prevState.cpassiserror;
+                  cpassword_error = "Your input doesn't match your previous password"
+                  cpassiserror = true
+                  return { ...prevState, cpassword_error,cpassiserror };
+                });
+              }
+              else {
+                setError(prevState => {
+                  var cpassword_error = prevState.cpassword_error;
+                  var cpassiserror = prevState.cpassiserror;
+                  cpassword_error = ""
+                  cpassiserror = false
+                  return { ...prevState, cpassword_error,cpassiserror };
+                });
+              }
+          }
+          else{
+            setError(prevState => {
+              var password_error = prevState.password_error;
+              var passiserror = prevState.passiserror;
+              password_error = ""
+              passiserror = false
+              return { ...prevState, password_error,passiserror };
+            });
+              if(!(value === pins.cpassword) && (pins.cpassword !== "")){
+                setError(prevState => {
+                  var cpassword_error = prevState.cpassword_error;
+                  var cpassiserror = prevState.cpassiserror;
+                  cpassword_error = "Your input doesn't match your previous password"
+                  cpassiserror = true
+                  return { ...prevState, cpassword_error,cpassiserror };
+                });
+              }
+              else {
+                setError(prevState => {
+                  var cpassword_error = prevState.cpassword_error;
+                  var cpassiserror = prevState.cpassiserror;
+                  cpassword_error = ""
+                  cpassiserror = false
+                  return { ...prevState, cpassword_error,cpassiserror };
+                });
+              }
+          }
+        }
+        if(name === 'cpassword'){
+    
+          if(value.length === 0){
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = ""
+              cpassiserror = false
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+          else if(!(value === pins.password)  && (pins.password !== "")){
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = "Your input doesn't match your previous password"
+              cpassiserror = true
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+          else{
+            setError(prevState => {
+              var cpassword_error = prevState.cpassword_error;
+              var cpassiserror = prevState.cpassiserror;
+              cpassword_error = ""
+              cpassiserror = false
+              return { ...prevState, cpassword_error,cpassiserror };
+            });
+          }
+      }
+      }
+
+      // request that checks if the email is existing in the database
+      const checkHandler = (e) =>{
+        console.log(state)
+        axios.post("https://vending-insights-smu.firebaseapp.com/check",state)
+         .then(response => {
+                if(response.data.status ===  "NO"){
+                  setError(prevState => {
+                    var email_error = prevState.email_error;
+                    var emailiserror = prevState.emailiserror;
+                    email_error = "The email you input doesn't exist."
+                    emailiserror = true
+                    return { ...prevState, email_error,emailiserror };
+                  });
+                }
+                else if (error.emailiserror){
+                  setError(prevState => {
+                    var email_error = prevState.email_error;
+                    var emailiserror = prevState.emailiserror;
+                    email_error = ""
+                    emailiserror = false
+                    return { ...prevState, email_error,emailiserror };
+                    
+                  });
+                  sendHandler()
+                }
+                else{
+                  sendHandler()
+                }
+            }).catch(error => {console.log(error)})
+    }
+
+    // once the email exists, show hidden pin fields and call request that sends change code to the email
     const sendHandler = (e) =>{
 
         console.log(state)
@@ -76,19 +231,36 @@ export default function SignUp(){
         document.getElementsByClassName("pinfield")[1].hidden = false;
         document.getElementsByClassName("pinfield")[2].hidden = false;
         document.getElementById("emailb").hidden= true;
+        document.getElementById("email").disabled= true;
         document.getElementById("submitb").hidden= false;
         axios.post("https://vending-insights-smu.firebaseapp.com/sendEmail",state)
          .then(response => {
                 console.log(response)
             }).catch(error => {console.log(error)})
     }
-    const submitHandler = (e) =>{
-        console.log(pins)
 
-        axios.post("https://vending-insights-smu.firebaseapp.com/changePassword",pins)
+    // request that setup new password
+    const submitHandler = (e) =>{
+      const request = {
+        email: pins.email,
+        pin:pins.pin,
+        password: pins.password
+      }
+
+        axios.post("https://vending-insights-smu.firebaseapp.com/changePassword",request)
          .then(response => {
-            if(response.data == '200'){
-              window.location.href = '/';
+           console.log(response)
+            if(response.data.status === 'NO'){
+              setError(prevState => {
+                var pin_error = prevState.pin_error;
+                var piniserror = prevState.piniserror;
+                pin_error = "Your pin is incorrect."
+                piniserror = true
+                return { ...prevState, pin_error,piniserror };
+              });
+            }
+            else{
+            window.location.href = '/';
             }
             }).catch(error => {console.log(error)})
     }
@@ -115,6 +287,8 @@ export default function SignUp(){
                 label="Please Enter Your Email Address"
                 name="email"
                 autoComplete="email"
+                error ={error.emailiserror}
+              helperText = {error.email_error}
                 onChange= {changeHandler}
               />
             </Grid>
@@ -128,6 +302,8 @@ export default function SignUp(){
                 id="pin"
                 label="Enter Your PIN"
                 autoFocus
+                error ={error.piniserror}
+              helperText = {error.pin_error}
                 onChange= {pinHandler}
               />
             </Grid>
@@ -141,7 +317,9 @@ export default function SignUp(){
                 type="password"
                 id="password"
                 autoComplete="password"
-                onChange= {changeHandler}
+                error ={error.passiserror}
+              helperText = {error.password_error}
+                onChange= {pinHandler}
               />
             </Grid>
             <Grid item xs={12} className = 'pinfield' hidden={true}>
@@ -153,11 +331,14 @@ export default function SignUp(){
                 label="Comfirm New Password"
                 type="password"
                 id="changePassword"
+                error ={error.cpassiserror}
+              helperText = {error.cpassword_error}
+              onChange= {pinHandler}
               />
             </Grid>
           </Grid>
           <Button
-          onClick = {sendHandler}
+          onClick = {checkHandler}
             fullWidth
             color = 'secondary'
             variant="contained"
@@ -174,8 +355,9 @@ export default function SignUp(){
             variant="contained"
             id = "submitb"
             className={classes.submit}
+            disabled = {pins.pin === ""||pins.password === ""||pins.cpassword ===""|| error.passiserror
+          ||error.cpassiserror}
             hidden = {true}
-          //  href='\'
           >
             Submit
           </Button>

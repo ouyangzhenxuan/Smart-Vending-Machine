@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import { Card, CardBody, CardTitle, CardSubtitle } from 'reactstrap';
 
+// IconWidget function that handles Icons
 const IconWidget = ({
   bgColor,
   icon: Icon,

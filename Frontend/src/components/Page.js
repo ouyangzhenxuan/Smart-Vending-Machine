@@ -9,6 +9,7 @@ import Typography from './Typography';
 
 const bem = bn.create('page');
 
+// page function that defines a general page
 const Page = ({
   title,
   breadcrumbs,

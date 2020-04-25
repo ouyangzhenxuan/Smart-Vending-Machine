@@ -1,65 +1,252 @@
-import { AnnouncementCard, TodosCard } from 'components/Card';
-import HorizontalAvatarList from 'components/HorizontalAvatarList';
-import MapWithBubbles from 'components/MapWithBubbles';
 import Page from 'components/Page';
-import ProductMedia from 'components/ProductMedia';
-import SupportTicket from 'components/SupportTicket';
-import UserProgressTable from 'components/UserProgressTable';
-import { IconWidget, NumberWidget } from 'components/Widget';
-import MapContainer from 'components/Maps/maps'
-import {revenue} from 'data/chartdata';
-import {
-  productsData,
-  supportTicketsData,
-  todosData,
-  userProgressTableData,
-} from 'demos/dashboardPage';
+import { NumberWidget } from 'components/Widget';
+import MapContainer from 'components/Maps/Maps'
+import { getColor } from 'utils/colors';
+import axios from 'axios'
 import React from 'react';
 import  MainLayout from '../components/Layout/MainLayout'
-import { Bar, Line } from 'react-chartjs-2';
+import { Line,Bar } from 'react-chartjs-2';
 import {
-  MdBubbleChart,
-  MdInsertChart,
-  MdPersonPin,
-  MdPieChart,
-  MdRateReview,
-  MdShare,
-  MdShowChart,
-  MdThumbUp,
-} from 'react-icons/md';
-import InfiniteCalendar from 'react-infinite-calendar';
-import {
-  Badge,
-  Button,
   Card,
   CardBody,
-  CardDeck,
-  CardGroup,
   CardHeader,
-  CardTitle,
   Col,
-  ListGroup,
-  ListGroupItem,
   Row,
 } from 'reactstrap';
-import { getColor } from 'utils/colors';
+import {decode,checkExpired} from '../components/Authendication'
 
-const today = new Date();
-const lastWeek = new Date(
-  today.getFullYear(),
-  today.getMonth(),
-  today.getDate() - 7,
-);
 
+// main dashboard page
 class DashboardPage extends React.Component {
+  _isMounted = false;
+  constructor(props){
+    // defines monthly data and graph data
+    super(props);
+    this.state={
+      year: undefined,
+      month:undefined,
+      email: undefined,
+      token:localStorage.jtwToken,
+      count:undefined,
+      non_count:undefined,
+      monthly_sale:undefined,
+      pre_monthly_sale:undefined,
+      monthly_purchase:undefined,
+      pre_monthly_purchase:undefined,
+      monthly_profit:undefined,
+      pre_monethly_profit:undefined,
+      bar_data:{labels: ['January','February','March','April','May','June','July','August','September',
+    'October','November','December'],
+      datasets: [
+        {
+          label: 'Annual Net Sales',
+          backgroundColor: getColor('primary'),
+        borderColor: getColor('primary'),
+        borderWidth: 1,
+          data: [0,0,0,0,0,0,0,0,0,0,0,0],
+          
+        }]
+    },
+    profit_data: {
+      labels: ['January','February','March','April','May','June','July','August','September',
+    'October','November','December'],
+      datasets: [
+        {
+          label: 'Net Profits',
+          borderColor: getColor('red'),
+          backgroundColor: getColor('red'),
+          data: [0,0,0,0,0,0,0,0,0,0,0,0],
+          borderWidth: 1,
+          fill:true
+        }],},
+    weekly_revenue: {
+      labels: [0,0,0,0,0,0,0],
+      datasets: [
+        {
+          label: 'Net Sales',
+          borderColor: '#6a82fb',
+          backgroundColor: getColor('purple'),
+          data: [0,0,0,0,0,0,0],
+          borderWidth: 1,
+          fill:false
+        }],},
+  }
+}
   componentDidMount() {
-    // this is needed, because InfiniteCalendar forces window scroll
+    this._isMounted = true;
     window.scrollTo(0, 0);
   }
 
+  // when loading the page, check session, then call all requests
+  componentWillMount(){
+    if(localStorage.jtwToken){
+      var code = decode()
+      if(!checkExpired(code.exp)){
+        window.location.href='/?session=false';
+      }
+      else{
+        let today = new Date()
+        this.setState({
+          year:today.getFullYear(),
+          month:today.getMonth()+1,
+          email:code.email,
+        },()=>{
+          this.loginHandler()
+            this.getHandler()
+            this.saleHandler()
+            this.barHandler()
+            this.profitHandler()
+        })
+        
+      }
+    }
+    else{
+      window.location.href='/';
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  // request that returns seven days company sale
+  saleHandler = (e) =>{
+    const data = {
+      email:this.state.email
+    }
+    axios.post("https://vending-insights-smu.firebaseapp.com/analysis/recentsevendayscompanysale",data)
+     .then(response => {
+       if (this._isMounted) {
+            this.setState(prevState => {
+              var revenue = {...prevState.weekly_revenue};
+              for(var i = 6; i >-1; i--) { 
+                  var date = response.data.days[i].month +'/'+ response.data.days[i].day
+                  revenue.labels[i] = date
+              }
+              revenue.labels = revenue.labels.reverse()
+              revenue.datasets[0].data = response.data.sale.reverse()
+              return { ...prevState, revenue };
+  
+             })}
+       }).catch(error => {console.log(error)})
+  }
+
+  // request that returns company annual sale 
+  barHandler = (e) =>{
+    const data = {
+      email:this.state.email,
+      year: 2020
+    }
+    axios.post("https://vending-insights-smu.firebaseapp.com/analysis/recentsevendayscompanymonthsale",data)
+     .then(response => {
+      if (this._isMounted) {
+            this.setState(prevState => {
+              var bar = {...prevState.bar_data};
+              bar.datasets[0].data = response.data.sale
+              return { ...prevState, bar };
+  
+             })}
+       }).catch(error => {console.log(error)})
+  }
+
+  // request that returns company annual profit
+  profitHandler = (e) =>{
+    const data = {
+      email:this.state.email,
+      year: '2020'
+    }
+    axios.post("https://vending-insights-smu.firebaseapp.com/analysis/getyearprofitbyuser",data)
+     .then(response => {
+      if (this._isMounted) {
+            this.setState(prevState => {
+              var profit = {...prevState.profit_data};
+              profit.datasets[0].data = response.data
+              return { ...prevState, profit };
+  
+             })}
+       }).catch(error => {console.log(error)})
+  }
+
+  // request that checks session
+  loginHandler = (e) =>{
+    const data = {
+      id:localStorage.id,
+      email:localStorage.email
+    }
+    axios.post("https://vending-insights-smu.firebaseapp.com/checktoken",data)
+     .then(response => {
+       if(response.data === 'NO'){
+         delete localStorage.id
+         delete localStorage.jtwToken
+        window.location.href='/?login=false';
+       }
+       }).catch(error => {console.log(error)})
+  }
+
+  // request that returns monthly data 
+  getHandler = (e) =>{
+    
+    const info = {
+      year: this.state.year,
+      month:this.state.month,
+      email: this.state.email,
+      token:localStorage.jtwToken
+    }
+    axios.post("https://vending-insights-smu.firebaseapp.com/vm/vminfo",info)
+     .then(response => {
+      if (this._isMounted) {
+           this.setState({
+             
+             count:response.data.count,
+             non_count:100,
+             monthly_sale:response.data.total_sale,
+             pre_monthly_sale: parseFloat((100*response.data.total_sale/response.data.previous_total_sale).toFixed(2)),
+             monthly_purchase: response.data.purchase_count,
+             pre_monthly_purchase: parseFloat((100*response.data.purchase_count/response.data.previous_purchase_count).toFixed(2)),
+             monthly_profit: response.data.profit,
+             pre_monethly_profit:parseFloat((100*response.data.profit/response.data.previous_profit).toFixed(2))
+           })
+           // if the data returns as 0 or null, handles it to be properly displayed
+           if(response.data.count === 0 || response.data.count === null){
+            this.setState(prevState => {
+              var non_count = prevState.non_count;
+              non_count = 100
+              return { ...prevState, non_count };
+            })
+           }
+           if(response.data.previous_total_sale === 0 || response.data.previous_total_sale === null){
+            this.setState(prevState => {
+              var pre_monthly_sale = prevState.pre_monthly_sale;
+              pre_monthly_sale = 100
+              return { ...prevState, pre_monthly_sale };
+            })
+           }
+           if(response.data.total_sale === null){
+            this.setState(prevState => {
+              var monthly_sale = prevState.monthly_sale;
+              monthly_sale = 0
+              return { ...prevState, monthly_sale };
+            })
+           }
+           if(response.data.previous_purchase_count === 0 || response.data.previous_purchase_count === null){
+            this.setState(prevState => {
+              var pre_monthly_purchase = prevState.pre_monthly_purchase;
+              pre_monthly_purchase = 100
+              return { ...prevState, pre_monthly_purchase };
+            })
+           }
+           if(response.data.previous_profit === 0 || response.data.previous_profit === null){
+            this.setState(prevState => {
+              var pre_monethly_profit = prevState.pre_monethly_profit;
+              pre_monethly_profit = 100
+              return { ...prevState, pre_monethly_profit };
+            })
+           }}
+        }).catch(error => {console.log(error)})
+}
+
+
   render() {
-    const primaryColor = getColor('primary');
-    const secondaryColor = getColor('secondary');
 
     return (
       <MainLayout breakpoint={this.props.breakpoint}> 
@@ -71,11 +258,12 @@ class DashboardPage extends React.Component {
         <Row>
           <Col lg={3} md={6} sm={6} xs={12}>
             <NumberWidget
+            // number widget component that shows a monthly data
               title="Total Vending Machines"
-              number="9800"
+              number={this.state.count}
               color="secondary"
               progress={{
-                value: 100,
+                value: this.state.non_count,
                 label: 'Active',
               }}
             />
@@ -85,10 +273,10 @@ class DashboardPage extends React.Component {
             <NumberWidget
               title="Monthly Net Sales"
               subtitle="This month"
-              number="1M"
+              number={this.state.monthly_sale}
               color="secondary"
               progress={{
-                value: 80,
+                value: this.state.pre_monthly_sale,
                 label: 'Last month',
               }}
             />
@@ -98,10 +286,10 @@ class DashboardPage extends React.Component {
             <NumberWidget
               title="Monthly Purchases"
               subtitle="This month"
-              number="50k"
+              number={this.state.monthly_purchase}
               color="secondary"
               progress={{
-                value: 92,
+                value: this.state.pre_monthly_purchase,
                 label: 'Last month',
               }}
             />
@@ -111,10 +299,10 @@ class DashboardPage extends React.Component {
             <NumberWidget
               title="Monthly Profits"
               subtitle="This month"
-              number="21k"
+              number={this.state.monthly_profit}
               color="secondary"
               progress={{
-                value: 98,
+                value: this.state.pre_monethly_profit,
                 label: 'Last month',
               }}
             />
@@ -130,173 +318,38 @@ class DashboardPage extends React.Component {
                 <small className="text-muted text-capitalize">Recent 7 Days</small>
               </CardHeader>
               <CardBody>
-                <Line data={revenue.weekly_revenue}/>
+                <Line data={this.state.weekly_revenue}/>
               </CardBody>
             </Card>
           </Col>
           
           <Col lg="5" md="12" sm="12" xs="12" > 
-            <MapContainer></MapContainer>
+            <MapContainer
+            // call map class to show Google map API
+            ></MapContainer>
           </Col>
 
           
         </Row>
-
-        <CardGroup style={{ marginBottom: '1rem' }}>
-          <IconWidget
-            bgColor="white"
-            inverse={false}
-            icon={MdThumbUp}
-            title="50+ Likes"
-            subtitle="People you like"
-          />
-          <IconWidget
-            bgColor="white"
-            inverse={false}
-            icon={MdRateReview}
-            title="10+ Reviews"
-            subtitle="New Reviews"
-          />
-          <IconWidget
-            bgColor="white"
-            inverse={false}
-            icon={MdShare}
-            title="30+ Shares"
-            subtitle="New Shares"
-          />
-        </CardGroup>
-
         <Row>
-          <Col md="6" sm="12" xs="12">
-            <Card>
-              <CardHeader>New Products</CardHeader>
-              <CardBody>
-                {productsData.map(
-                  ({ id, image, title, description, right }) => (
-                    <ProductMedia
-                      key={id}
-                      image={image}
-                      title={title}
-                      description={description}
-                      right={right}
-                    />
-                  ),
-                )}
-              </CardBody>
-            </Card>
-          </Col>
-
-          <Col md="6" sm="12" xs="12">
-            <Card>
-              <CardHeader>New Users</CardHeader>
-              <CardBody>
-                <UserProgressTable
-                  headers={[
-                    <MdPersonPin size={25} />,
-                    'name',
-                    'date',
-                    'participation',
-                    '%',
-                  ]}
-                  usersData={userProgressTableData}
-                />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col lg="4" md="12" sm="12" xs="12">
-            <InfiniteCalendar
-              selected={today}
-              minDate={lastWeek}
-              width="100%"
-              theme={{
-                accentColor: primaryColor,
-                floatingNav: {
-                  background: secondaryColor,
-                  chevron: primaryColor,
-                  color: '#FFF',
-                },
-                headerColor: primaryColor,
-                selectionColor: secondaryColor,
-                textColor: {
-                  active: '#FFF',
-                  default: '#333',
-                },
-                todayColor: secondaryColor,
-                weekdayColor: primaryColor,
-              }}
-            />
-          </Col>
-
-          <Col lg="8" md="12" sm="12" xs="12">
-            <Card inverse className="bg-gradient-primary">
-              <CardHeader className="bg-gradient-primary">
-                Map with bubbles
-              </CardHeader>
-              <CardBody>
-                <MapWithBubbles />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* <CardDeck style={{ marginBottom: '1rem' }}>
-          <Card body style={{ overflowX: 'auto','paddingBottom':'15px','height': 'fit-content','paddingTop': 'inherit'}}>
-            <HorizontalAvatarList
-              avatars={avatarsData}
-              avatarProps={{ size: 50 }}
-            />
+        <Col xl={6} lg={12} md={12}>
+          <Card>
+            <CardHeader>Annual Net Sales</CardHeader>
+            <CardBody>
+              <Bar data = {this.state.bar_data}/>
+            </CardBody>
           </Card>
-
-          <Card body style={{ overflowX: 'auto','paddingBottom':'15px','height': 'fit-content','paddingTop': 'inherit'}}>
-            <HorizontalAvatarList
-              avatars={avatarsData}
-              avatarProps={{ size: 50 }}
-              reversed
-            />
+        </Col>
+        <Col xl={6} lg={12} md={12}>
+          <Card>
+            <CardHeader>Annual Profits</CardHeader>
+            <CardBody>
+              <Bar data = {this.state.profit_data}/>
+            </CardBody>
           </Card>
-        </CardDeck> */}
-
-        <Row>
-          <Col lg="4" md="12" sm="12" xs="12">
-            <AnnouncementCard
-              color="gradient-secondary"
-              header="Announcement"
-              avatarSize={60}
-              name="Jamy"
-              date="1 hour ago"
-              text="Lorem ipsum dolor sit amet,consectetuer edipiscing elit,sed diam nonummy euismod tinciduntut laoreet doloremagna"
-              buttonProps={{
-                children: 'show',
-              }}
-              style={{ height: 500 }}
-            />
-          </Col>
-
-          <Col lg="4" md="12" sm="12" xs="12">
-            <Card>
-              <CardHeader>
-                <div className="d-flex justify-content-between align-items-center">
-                  <span>Support Tickets</span>
-                  <Button>
-                    <small>View All</small>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardBody>
-                {supportTicketsData.map(supportTicket => (
-                  <SupportTicket key={supportTicket.id} {...supportTicket} />
-                ))}
-              </CardBody>
-            </Card>
-          </Col>
-
-          <Col lg="4" md="12" sm="12" xs="12">
-            <TodosCard todos={todosData} />
-          </Col>
+        </Col>
         </Row>
+
       </Page>
       </MainLayout>
     );

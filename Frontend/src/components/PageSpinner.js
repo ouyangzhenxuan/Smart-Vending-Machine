@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Spinner } from 'reactstrap';
 
+// page spinner function
 const PageSpinner = ({ color = 'primary' }) => {
   return (
     <div className="cr-page-spinner">

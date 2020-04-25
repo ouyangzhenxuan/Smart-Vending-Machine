@@ -4,6 +4,7 @@ import PropTypes from 'utils/propTypes';
 import { Card, CardText, CardTitle, Progress } from 'reactstrap';
 import Typography from '../Typography';
 
+// Number widget function that shows a value count with previous count
 const NumberWidget = ({
   title,
   subtitle,

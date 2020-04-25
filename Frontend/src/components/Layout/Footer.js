@@ -3,6 +3,7 @@ import React from 'react';
 import { Navbar, Nav, NavItem } from 'reactstrap';
 
 
+// footer function that returns a footer information.
 const Footer = () => {
   return (
     <Navbar>

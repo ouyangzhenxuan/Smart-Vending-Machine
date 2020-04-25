@@ -680,7 +680,17 @@ routes.post('/updatetransaction', (request, response) => {
                 inventory: Number(new_inventory) - Number(order_amount)
             })
         })
-    }).catch(function(error){
+    }).then(function(){
+        var new_sales = 0;
+        firebase.database().ref('users/' + hash + '/vm/' + vm_id).once("value", function(snapshot){
+            new_sales = snapshot.child('sales').val();
+        }).then(function(){
+            firebase.database().ref('users/' + hash + '/vm/' + vm_id).update({
+                sales: Number(new_sales) + Number(order_amount)
+            })
+        })
+    })
+    .catch(function(error){
         if(error){
             response.send('update fail')
             console.log('update fail: '+ error);

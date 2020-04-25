@@ -6,6 +6,7 @@ import { Container } from 'reactstrap';
 
 const bem = bn.create('content');
 
+// simple content function that displays all classes' information
 const Content = ({ tag: Tag, className, ...restProps }) => {
   const classes = bem.b(className);
 

@@ -7,6 +7,7 @@ import { Card, CardTitle, CardSubtitle, CardText, CardBody } from 'reactstrap';
 
 import Avatar from '../Avatar';
 
+// User Card property that returns a card with user information
 const UserCard = ({
   avatar,
   avatarSize,
@@ -20,6 +21,7 @@ const UserCard = ({
   const classes = classNames('bg-gradient-theme', className);
 
   return (
+    // returns card
     <Card inverse className={classes} {...restProps}>
       <CardBody className="d-flex justify-content-center align-items-center flex-column">
         <Avatar src={avatar} size={avatarSize} className="mb-2" />
@@ -34,6 +36,7 @@ const UserCard = ({
   );
 };
 
+// User card property
 UserCard.propTypes = {
   avatar: PropTypes.string,
   avatarSize: PropTypes.number,

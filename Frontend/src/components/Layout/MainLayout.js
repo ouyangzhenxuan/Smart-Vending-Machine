@@ -8,6 +8,7 @@ import {
 import NotificationSystem from 'react-notification-system';
 import { NOTIFICATION_SYSTEM_STYLE } from 'utils/constants';
 
+// Mainlayout class that combines footer header and sidebar.
 class MainLayout extends React.Component {
   static isSidebarOpen() {
     return document
@@ -28,7 +29,7 @@ class MainLayout extends React.Component {
       if (!this.notificationSystem) {
         return;
       }
-
+      // showing a notification 
       this.notificationSystem.addNotification({
         title: <MdImportantDevices />,
         message: 'Welome to Smart Vending Machine',
@@ -74,6 +75,7 @@ class MainLayout extends React.Component {
     document.querySelector('.cr-sidebar').classList.remove('cr-sidebar--open');
   }
 
+  // export a mainlayout property
   render() {
     const { children } = this.props;
     return (

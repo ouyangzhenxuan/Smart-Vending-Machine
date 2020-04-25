@@ -1,5 +1,6 @@
 import React from 'react';
 
+// source link function that redirects to that link
 const SourceLink = props => {
   /* eslint-disable jsx-a11y/anchor-has-content */
   return (

@@ -4,6 +4,7 @@ import { Card, CardBody, CardSubtitle, CardText, CardTitle } from 'reactstrap';
 import PropTypes from 'utils/propTypes';
 import Avatar from '../Avatar';
 
+// Avartar Card that returns a card shows avatar info
 const AvatarCard = ({
   avatar,
   avatarSize,
@@ -17,6 +18,7 @@ const AvatarCard = ({
   const classes = classNames('bg-gradient-theme-left', className);
 
   return (
+    // return a card
     <Card inverse className={classes} {...restProps}>
       <CardBody className="d-flex justify-content-center align-items-center flex-column">
         <Avatar src={avatar} size={avatarSize} className="mb-3" />

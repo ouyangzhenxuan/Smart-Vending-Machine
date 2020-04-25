@@ -3,8 +3,9 @@ import PropTypes from 'utils/propTypes';
 
 import classNames from 'classnames';
 
-import userImage from 'assets/img/users/jamita.jpg';
+import userImage from 'assets/img/users/default_user.png';
 
+// basic avatar function that is used for avatar card and user card
 const Avatar = ({
   rounded,
   circle,
@@ -25,7 +26,7 @@ const Avatar = ({
     />
   );
 };
-
+// define properties
 Avatar.propTypes = {
   tag: PropTypes.component,
   rounded: PropTypes.bool,

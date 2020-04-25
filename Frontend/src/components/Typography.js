@@ -19,7 +19,7 @@ const tagMap = {
 };
 
 const types = Object.keys(tagMap);
-
+// defines general typography
 const Typography = ({ tag: Tag, className, type, ...restProps }) => {
   const classes = classNames({ [type]: !!type }, className);
   let TypoComp;

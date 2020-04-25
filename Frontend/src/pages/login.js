@@ -1,7 +1,4 @@
-import React from 'react';
-
-// import { Redirect } from 'react-router-dom';
-
+import React,{useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,7 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Image from '../assets/img/bg/img2.jpeg';
 import axios from 'axios';
-
+import {decode,checkExpired} from '../components/Authendication'
 
 function Copyright() {
     return (
@@ -61,58 +58,173 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+// defines function that reads values from url
+function getUrlVars() { 
+  var vars = {}; 
+  window.location.href.replace(/[?&]+([^=&]+)=([-]*[a-zA-z0-9]*[.]*[a-zA-z0-9]*)/gi, function(m,key,value) { 
+     vars[key] = value; 
+  })
+  return vars; 
+}
+
+// login page that allows user to login account
 export default function SignInSide() {
   const classes = useStyles();
 
-  const state = {
-    email:"",
+const [user,setUser]  = React.useState({
+  email:undefined,
     password:""
-}
-    const error = {
-        iserror : false,
-        errormsg: "Invalid Email Address or Password"
-    }
+});
+
+  const [state,setState]  = React.useState({
+    data:false,
+    check:false,
+    login:false,
+    change:false
+  });
+
+  const [error,setError]  = React.useState({
+    email_error:"",
+    emailiserror:false,
+    password_error:"",
+    passiserror:false
+  });
+
+  // user input change handler
     const changeHandler = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
-        
-        state[name]=value;
-    }
+      setUser({...user, [e.target.name]: e.target.value})
 
-    const getallvm = (props) =>{
-      var vmdata = {
-        "1":{
-          longitude: 1,
-          latitude: 2,
-          sales: 3
-        }
-      };
-      for(var i=0; i<vmdata.length; i++){
-        console.log(vmdata[i]);
+    }
+// check box change handler
+    function checkHandler(event, isChecked, value){
+      setState(prevState => {
+        var check = prevState.check;
+        var change = prevState.change
+        change = true
+        check = isChecked
+        return { ...prevState, check,change};
       }
-      const data = vmdata.map((i)=>i);
-      console.log(data);
+      )
     }
 
-
-    const submitHandler = (props) =>{
-        console.log(state)
-        axios.post("https://vending-insights-smu.firebaseapp.com/user/login",state)
+    // request that sends login info and directs to main dashboard
+    // it will also check input validation before sending the request
+    const submitHandler = (e) =>{
+      if(user.email === ""){
+        setError(prevState => {
+          var email_error = prevState.email_error;
+          var emailiserror = prevState.emailiserror;
+          email_error = "Your email address cannot be empty"
+          emailiserror = true
+          return { ...prevState, email_error,emailiserror };
+        });
+      }
+      if(user.password === ""){
+        setError(prevState => {
+          var password_error = prevState.password_error;
+          var passiserror = prevState.passiserror;
+          password_error = "Your password cannot be empty"
+          passiserror = true
+          return { ...prevState, password_error,passiserror };
+        });
+      }
+      if(error.emailiserror && user.email !== ""){
+        setError(prevState => {
+          var email_error = prevState.email_error;
+          var emailiserror = prevState.emailiserror;
+          email_error = ""
+          emailiserror = false
+          return { ...prevState, email_error,emailiserror };
+        });
+      }
+      if(error.passiserror&& user.password !== ""){
+        setError(prevState => {
+          var password_error = prevState.password_error;
+          var passiserror = prevState.passiserror;
+          password_error = ""
+          passiserror = false
+          return { ...prevState, password_error,passiserror };
+        });
+      }
+      if(user.email !== "" && user.password !== ""){
+        axios.post("https://vending-insights-smu.firebaseapp.com/login",user)
         .then(response => {
-          console.log(response)
-                if(response.data === 'okay'){
+                if(response.data !== 'no'){
+                    localStorage.setItem('jtwToken',response.data.token)
+                    localStorage.setItem('auth',response.data.auth)
+                    localStorage.setItem('id',response.data.id)
+                    if(state.check){
+                      localStorage.setItem('email',user.email)
+                    }
+                    else{
+                      if(localStorage.email){
+                        delete localStorage.email}
+                    }
                     window.location.href = '/dashboard';
-                    // props.history.push('/dashboard');
+                    
                 }
                 else{
-                    document.getElementsByClassName("error")[0].hidden = false;
+                  setError(prevState => {
+                    var password_error = prevState.password_error;
+                    var passiserror = prevState.passiserror;
+                    password_error = "Your input information doesn't match, try again "
+                    passiserror = true
+                    return { ...prevState, password_error,passiserror };
+                  });
                      
                 }
 
-            }).catch(error => {console.log(error)});
-        
+            }).catch(error => {console.log(error)})
     }
+  }
 
+  // check session token, if there is a token, redirect to dashboard without login
+    useEffect(() => {
+      if(localStorage.email){
+        if(user.email === undefined){
+          document.getElementById('email').value = localStorage.email
+        setUser({...user, email:localStorage.email})
+        }
+        if(state.change === false){
+        setState({
+          check:true
+        })}
+        
+      }
+      if(localStorage.jtwToken){
+        var code = decode()
+        if(checkExpired(code.exp)){
+          window.location.href='/dashboard';
+        }
+        
+      }
+    },[state.check,user,state.change]);
+
+    // function that checks url info
+    // it will display expired session or login on another device message
+    function checkSession(){
+      var result = getUrlVars();
+      if(result['session']){
+        if(!state.data){
+          setState(prevState => {
+            var data = prevState.data;
+            data = true
+            return { ...prevState, data};
+          }
+          )
+      }
+      }
+      if(result['login']){
+        if(!state.login){
+          setState(prevState => {
+            var login = prevState.login;
+            login = true
+            return { ...prevState, login};
+          }
+          )
+      }
+      }
+    }
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -125,6 +237,8 @@ export default function SignInSide() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          <div hidden = {!state.data}>{checkSession()}You session is lost. Try to login again.</div>
+          <div hidden = {!state.login}>{checkSession()}Your account was logged in on another device</div>
           <form className={classes.form} noValidate 
           >
             <TextField
@@ -137,6 +251,8 @@ export default function SignInSide() {
               name="email"
               autoComplete="email"
               autoFocus
+              error ={error.emailiserror}
+              helperText = {error.email_error}
               onChange= {changeHandler}
             />
             <TextField
@@ -149,15 +265,17 @@ export default function SignInSide() {
               type="password"
               id="password"
               autoComplete="current-password"
+              error ={error.passiserror}
+                helperText = {error.password_error}
               onChange= {changeHandler}
             /><div>
             <span className='error' hidden={true} align='left' color='red'>{error.errormsg}</span></div>
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              control={<Checkbox checked={state.check} id ='check' color="primary" onChange = {checkHandler} />}
+              label="Remember me" 
             />
             <Button
-            onClick = {function(){submitHandler();getallvm();}}
+            onClick = {submitHandler}
               fullWidth
               variant="contained"
               color="primary"

@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 
+// BEM function
 export const createBEM = namespace => {
   return {
     create: blockName => {

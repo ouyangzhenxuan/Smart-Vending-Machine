@@ -9,6 +9,7 @@ if (hasGAId) {
   ReactGA.initialize(process.env.REACT_APP_GOOGLE_ANALYTICS);
 }
 
+// GA listener used in APP for react routing
 class GAListener extends React.Component {
   static contextTypes = {
     router: PropTypes.object,

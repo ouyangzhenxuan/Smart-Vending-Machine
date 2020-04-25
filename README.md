@@ -1,2 +1,2 @@
-# Smart-Vender-Machine
-Smart vender machine
+# Smart-Vending-Machine
+Smart vending machine full stack project

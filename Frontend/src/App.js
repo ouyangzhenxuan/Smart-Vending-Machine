@@ -40,8 +40,7 @@ class App extends React.Component {
                 <Route exact path="/vendingmachine" component={VendingMachinePage} />
                 <Route exact path="/help" component={HelpPage} />
                 <Route exact path="/profile" component={ProfilePage} />
-                <Route exact path="/simulator" component={Simulator}
-                />
+                <Route exact path="/simulator" component={Simulator} />
               
             {/* </MainLayout> */}
             </React.Suspense>

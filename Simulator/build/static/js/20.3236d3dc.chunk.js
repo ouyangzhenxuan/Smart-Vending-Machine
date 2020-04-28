@@ -1,0 +1,2 @@
+(this["webpackJsonpsmart-vending-machine"]=this["webpackJsonpsmart-vending-machine"]||[]).push([[20],{1044:function(e,n,t){"use strict";t.r(n);var a=t(9),r=t(10),i=t(12),c=t(11),s=t(0),u=t.n(s),h=function(e){Object(i.a)(t,e);var n=Object(c.a)(t);function t(){return Object(a.a)(this,t),n.apply(this,arguments)}return Object(r.a)(t,[{key:"render",value:function(){return u.a.createElement("a",{href:"../Landing Pge/index.html"})}}]),t}(u.a.Component);n.default=h}}]);
+//# sourceMappingURL=20.3236d3dc.chunk.js.map
